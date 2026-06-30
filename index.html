@@ -3,62 +3,182 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Web3 Workshop NFT - Mint</title>
+  <title>Web3 Workshop NFT — Mint</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0d0d1a; color: #e0e0ff; font-family: system-ui, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
-    .card { background: linear-gradient(135deg, #1a1a3e, #0d0d2b); border: 1px solid #4a4aff44; border-radius: 24px; padding: 40px 36px; max-width: 440px; width: 100%; text-align: center; box-shadow: 0 0 60px #6600ff22; }
-    .nft-image { width: 200px; height: 200px; border-radius: 16px; margin: 0 auto 24px; display: block; border: 2px solid #7755ff66; }
-    h1 { font-size: 1.6rem; font-weight: 700; background: linear-gradient(90deg,#aa88ff,#6644ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+    body {
+      background: #0d0d1a;
+      color: #e0e0ff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: linear-gradient(135deg, #1a1a3e 0%, #0d0d2b 100%);
+      border: 1px solid #4a4aff44;
+      border-radius: 24px;
+      padding: 40px 36px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 60px #6600ff22;
+    }
+    .nft-image {
+      width: 200px;
+      height: 200px;
+      border-radius: 16px;
+      margin: 0 auto 24px;
+      display: block;
+      border: 2px solid #7755ff66;
+    }
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #aa88ff, #6644ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
     .subtitle { color: #8888bb; font-size: 0.9rem; margin-bottom: 28px; }
-    .info-row { display: flex; justify-content: space-between; font-size: 0.85rem; color: #9999cc; margin-bottom: 8px; }
+    .info-row { display: flex; justify-content: space-between; font-size: 0.85rem; color: #9999cc; margin-bottom: 8px; padding: 0 4px; }
     .info-row span:last-child { color: #ccbbff; font-weight: 600; }
-    hr { border: none; border-top: 1px solid #ffffff11; margin: 20px 0; }
-    .status { background: #ffffff08; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.85rem; color: #aaaacc; min-height: 44px; display: flex; align-items: center; justify-content: center; }
-    .success { color: #66ff99; } .error { color: #ff6666; }
-    .btn { width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 12px; color: white; transition: all 0.2s; }
+    .divider { border: none; border-top: 1px solid #ffffff11; margin: 20px 0; }
+    .status-box { background: #ffffff08; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.85rem; color: #aaaacc; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+    .status-box.success { color: #66ff99; }
+    .status-box.error { color: #ff6666; }
+    .btn { width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-bottom: 12px; }
     .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    #btn-connect { background: linear-gradient(90deg,#5533ff,#8855ff); }
-    #btn-mint { background: linear-gradient(90deg,#7744ff,#aa55ff); }
-    .badge { display:inline-block; background:#ffffff11; border-radius:8px; padding:4px 10px; font-size:0.78rem; color:#aabbff; margin-bottom:16px; }
-    .tx-link { display:block; margin-top:8px; color:#aa88ff; font-size:0.8rem; text-decoration:none; }
-    .powered { margin-top:24px; font-size:0.72rem; color:#44446655; }
+    .btn-connect { background: linear-gradient(90deg, #5533ff, #8855ff); color: white; }
+    .btn-mint { background: linear-gradient(90deg, #7744ff, #aa55ff); color: white; }
+    .wallet-badge { display: inline-block; background: #ffffff11; border-radius: 8px; padding: 4px 10px; font-size: 0.78rem; color: #aabbff; margin-bottom: 16px; word-break: break-all; }
+    .tx-link { display: inline-block; margin-top: 8px; color: #aa88ff; font-size: 0.8rem; text-decoration: none; }
+    .powered { margin-top: 24px; font-size: 0.72rem; color: #44446688; }
   </style>
 </head>
 <body>
   <div class="card">
-    <img class="nft-image" src="https://ipfs.io/ipfs/bafkreiejmocywlzt5uce6uupw4fms2edc2qb4xbtglrsjeipbvhnzajihy" alt="NFT" />
+    <img class="nft-image"
+         src="https://ipfs.io/ipfs/bafkreiejmocywlzt5uce6uupw4fms2edc2qb4xbtglrsjeipbvhnzajihy"
+         alt="Web3 Workshop NFT" />
     <h1>Web3 Workshop NFT</h1>
-    <p class="subtitle">Proof of Attendance &middot; Polygon Mainnet</p>
-    <div class="info-row"><span>Contract</span><span>0xe852...e86E</span></div>
-    <div class="info-row"><span>Network</span><span>Polygon Mainnet</span></div>
-    <div class="info-row"><span>Price</span><span>Free (gas only)</span></div>
-    <div class="info-row"><span>Max Supply</span><span>8</span></div>
-    <hr/>
-    <div id="status" class="status">Connect wallet to Mint</div>
-    <div id="walletDisplay" style="display:none"><div id="walletAddr" class="badge"></div></div>
-    <button id="btn-connect" class="btn" onclick="connect()">🦊 Connect MetaMask</button>
-    <button id="btn-mint" class="btn" onclick="mint()" disabled>✨ Mint NFT</button>
-    <div id="txResult"></div>
-    <p class="powered">Powered by Polygon &middot; IPFS &middot; OpenZeppelin</p>
+    <p class="subtitle">Proof of Attendance · Polygon Mainnet</p>
+    <div class="info-row"><span>合约地址</span><span>0xe852...e86E</span></div>
+    <div class="info-row"><span>网络</span><span>Polygon (MATIC)</span></div>
+    <div class="info-row"><span>Mint 价格</span><span>免费 (只需 gas)</span></div>
+    <div class="info-row"><span>最大供应量</span><span>8 个</span></div>
+    <hr class="divider" />
+    <div id="status" class="status-box">连接钉包开始 Mint ↓</div>
+    <div id="wallet-display" style="display:none">
+      <div id="wallet-addr" class="wallet-badge"></div>
+    </div>
+    <button id="btn-connect" class="btn btn-connect" onclick="connectWallet()">🦊 连接 MetaMask</button>
+    <button id="btn-mint" class="btn btn-mint" onclick="mintNFT()" disabled>✨ Mint NFT</button>
+    <div id="tx-result"></div>
+    <p class="powered">Powered by Polygon · IPFS · OpenZeppelin</p>
   </div>
   <script>
-    const CA = '0xe85227bAf06E285f0839939EBC4314309875e86E';
-    const PAGE = 'mirukuz.github.io/web3-workshop-mint/';
-    function enc(a) { return '0x6a627842' + a.replace('0x','').toLowerCase().padStart(64,'0'); }
-    function st(m, c='') { const e=document.getElementById('status'); e.textContent=m; e.className='status '+c; }
-    async function connect() {
+    const CONTRACT_ADDRESS = '0xe85227bAf06E285f0839939EBC4314309875e86E';
+    const PAGE_URL = 'mirukuz.github.io/web3-workshop-mint/';
+    const POLYGON_CHAIN_ID = '0x89';
+
+    function encodeMint(address) {
+      return '0x6a627842' + address.replace('0x','').toLowerCase().padStart(64,'0');
+    }
+
+    function setStatus(msg, type) {
+      const el = document.getElementById('status');
+      el.textContent = msg;
+      el.className = 'status-box' + (type ? ' ' + type : '');
+    }
+
+    async function switchToPolygon() {
+      try {
+        await ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:POLYGON_CHAIN_ID}]});
+      } catch(e) {
+        if (e.code === 4902) {
+          await ethereum.request({method:'wallet_addEthereumChain',params:[{chainId:POLYGON_CHAIN_ID,chainName:'Polygon Mainnet',nativeCurrency:{name:'POL',symbol:'POL',decimals:18},rpcUrls:['https://polygon-rpc.com'],blockExplorerUrls:['https://polygonscan.com']}]});
+        } else throw e;
+      }
+    }
+
+    async function connectWallet() {
       if (!window.ethereum) {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         if (isMobile) {
-          st('Opening MetaMask App...', '');
-          window.location.href = 'https://metamask.app.link/dapp/' + PAGE;
+          setStatus('📱 正在打开 MetaMask App...');
+          window.location.href = 'https://metamask.app.link/dapp/' + PAGE_URL;
         } else {
-          st('Please install MetaMask extension', 'error');
-          window.open('https://metamask.io/download/', '_blank');
+          setStatus('❌ 请先安装 MetaMask 浏览器插件','error');
+          window.open('https://metamask.io/download/','_blank');
         }
         return;
       }
       try {
-        st('Connecting...');
-        try { await ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:'0x89'}]}); }
+        setStatus('⏳ 连接中...');
+        await switchToPolygon();
+        const accounts = await ethereum.request({method:'eth_requestAccounts'});
+        const addr = accounts[0];
+        document.getElementById('wallet-addr').textContent = addr.slice(0,6)+'...'+addr.slice(-4);
+        document.getElementById('wallet-display').style.display = 'block';
+        document.getElementById('btn-connect').textContent = '✅ 已连接';
+        document.getElementById('btn-connect').disabled = true;
+        document.getElementById('btn-mint').disabled = false;
+        setStatus('✅ 钉包已连接，点击 Mint！','success');
+      } catch(e) {
+        setStatus('❌ ' + (e.message||'连接失败'),'error');
+      }
+    }
+
+    async function mintNFT() {
+      try {
+        const accounts = await ethereum.request({method:'eth_accounts'});
+        if (!accounts.length) { setStatus('❌ 请先连接钉包','error'); return; }
+        setStatus('⏳ 等待 MetaMask 确认...');
+        document.getElementById('btn-mint').disabled = true;
+        const txHash = await ethereum.request({method:'eth_sendTransaction',params:[{from:accounts[0],to:CONTRACT_ADDRESS,data:encodeMint(accounts[0]),gas:'0x30D40'}]});
+        setStatus('⏳ 交易已提交，等待确认...','success');
+        const link = document.createElement('a');
+        link.href = 'https://polygonscan.com/tx/' + txHash;
+        link.target = '_blank';
+        link.className = 'tx-link';
+        link.textContent = '🔗 在 Polygonscan 查看交易';
+        document.getElementById('tx-result').innerHTML = '';
+        document.getElementById('tx-result').appendChild(link);
+        let receipt = null;
+        for (let i = 0; i < 30; i++) {
+          await new Promise(r => setTimeout(r,3000));
+          receipt = await ethereum.request({method:'eth_getTransactionReceipt',params:[txHash]});
+          if (receipt) break;
+        }
+        if (receipt && receipt.status === '0x1') {
+          setStatus('🎉 NFT Mint 成功！欢迎加入！','success');
+        } else if (receipt) {
+          setStatus('❌ 交易失败，请重试','error');
+          document.getElementById('btn-mint').disabled = false;
+        }
+      } catch(e) {
+        setStatus('❌ ' + (e.message||'Mint 失败'),'error');
+        document.getElementById('btn-mint').disabled = false;
+      }
+    }
+
+    window.addEventListener('load', async () => {
+      if (window.ethereum) {
+        const accounts = await ethereum.request({method:'eth_accounts'});
+        if (accounts.length) {
+          document.getElementById('wallet-addr').textContent = accounts[0].slice(0,6)+'...'+accounts[0].slice(-4);
+          document.getElementById('wallet-display').style.display = 'block';
+          document.getElementById('btn-connect').textContent = '✅ 已连接';
+          document.getElementById('btn-connect').disabled = true;
+          document.getElementById('btn-mint').disabled = false;
+          setStatus('✅ 钉包已连接，点击 Mint！','success');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
