@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web3 Workshop NFT - Mint</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0d0d1a; color: #e0e0ff; font-family: system-ui, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .card { background: linear-gradient(135deg, #1a1a3e, #0d0d2b); border: 1px solid #4a4aff44; border-radius: 24px; padding: 40px 36px; max-width: 440px; width: 100%; text-align: center; box-shadow: 0 0 60px #6600ff22; }
+    .nft-image { width: 200px; height: 200px; border-radius: 16px; margin: 0 auto 24px; display: block; border: 2px solid #7755ff66; }
+    h1 { font-size: 1.6rem; font-weight: 700; background: linear-gradient(90deg,#aa88ff,#6644ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+    .subtitle { color: #8888bb; font-size: 0.9rem; margin-bottom: 28px; }
+    .info-row { display: flex; justify-content: space-between; font-size: 0.85rem; color: #9999cc; margin-bottom: 8px; }
+    .info-row span:last-child { color: #ccbbff; font-weight: 600; }
+    hr { border: none; border-top: 1px solid #ffffff11; margin: 20px 0; }
+    .status { background: #ffffff08; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.85rem; color: #aaaacc; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+    .success { color: #66ff99; } .error { color: #ff6666; }
+    .btn { width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 12px; color: white; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    #btn-connect { background: linear-gradient(90deg,#5533ff,#8855ff); }
+    #btn-mint { background: linear-gradient(90deg,#7744ff,#aa55ff); }
+    .badge { display:inline-block; background:#ffffff11; border-radius:8px; padding:4px 10px; font-size:0.78rem; color:#aabbff; margin-bottom:16px; }
+    .tx-link { display:block; margin-top:8px; color:#aa88ff; font-size:0.8rem; }
+    .powered { margin-top:24px; font-size:0.72rem; color:#44446655; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img class="nft-image" src="https://ipfs.io/ipfs/bafkreiejmocywlzt5uce6uupw4fms2edc2qb4xbtglrsjeipbvhnzajihy" alt="NFT" />
+    <h1>Web3 Workshop NFT</h1>
+    <p class="subtitle">Proof of Attendance &middot; Polygon Mainnet</p>
+    <div class="info-row"><span>Contract</span><span>0xe85...5e86E</span></div>
+    <div class="info-row"><span>Network</span><span>Polygon Mainnet</span></div>
+    <div class="info-row"><span>Price</span><span>Free (gas only)</span></div>
+    <div class="info-row"><span>Max Supply</span><span>8</span></div>
+    <hr/>
+    <div id="status" class="status">Connect wallet to Mint</div>
+    <div id="walletDisplay" style="display:none"><div id="walletAddr" class="badge"></div></div>
+    <button id="btn-connect" class="btn" onclick="connect()">Connect MetaMask</button>
+    <button id="btn-mint" class="btn" onclick="mint()" disabled>Mint NFT</button>
+    <div id="txResult"></div>
+    <p class="powered">Powered by Polygon &middot; IPFS &middot; OpenZeppelin</p>
+  </div>
+  <script>
+    const CA='0xe85C52e7292c36B0f5E3E07e0C56dc1c1e85e86E';
+    function enc(a){return'0x6a627842'+a.replace('0x','').toLowerCase().padStart(64,'0');}
+    function st(m,c=''){const e=document.getElementById('status');e.textContent=m;e.className='status '+c;}
+    async function connect(){
+      if(!window.ethereum){st('Please install MetaMask','error');return;}
+      try{
+        st('Connecting...');
+        try{await ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:'0x89'}]});}
+        catch(e){if(e.code===4902)await ethereum.request({method:'wallet_addEthereumChain',params:[{chainId:'0x89',chainName:'Polygon Mainnet',nativeCurrency:{name:'POL',symbol:'POL',decimals:18},rpcUrls:['https://polygon-rpc.com'],blockExplorerUrls:['https://polygonscan.com']}]});}
+        const[addr]=await ethereum.request({method:'eth_requestAccounts'});
+        document.getElementById('walletAddr').textContent=addr.slice(0,6)+'...'+addr.slice(-4);
+        document.getElementById('walletDisplay').style.display='block';
+        document.getElementById('btn-connect').textContent='Connected';
+        document.getElementById('btn-connect').disabled=true;
+        document.getElementById('btn-mint').disabled=false;
+        st('Wallet connected - click Mint!','success');
+      }catch(e){st('Error: '+(e.message||e),'error');}
+    }
+    async function mint(){
+      try{
+        const[from]=await ethereum.request({method:'eth_accounts'});
+        st('Waiting for MetaMask...');
+        document.getElementById('btn-mint').disabled=true;
+        const tx=await ethereum.request({method:'eth_sendTransaction',params:[{from,to:CA,data:enc(from),gas:'0x30D40'}]});
+        st('Submitted! Waiting for confirmation...','success');
+        const a=document.createElement('a');a.href='https://polygonscan.com/tx/'+tx;a.target='_blank';a.className='tx-link';a.textContent='View on Polygonscan';
+        document.getElementById('txResult').innerHTML='';document.getElementById('txResult').appendChild(a);
+        for(let i=0;i<30;i++){
+          await new Promise(r=>setTimeout(r,3000));
+          const r=await ethereum.request({method:'eth_getTransactionReceipt',params:[tx]});
+          if(r){if(r.status==='0x1')st('NFT Minted! Welcome!','success');else{st('TX failed','error');document.getElementById('btn-mint').disabled=false;}break;}
+        }
+      }catch(e){st('Error: '+(e.message||e),'error');document.getElementById('btn-mint').disabled=false;}
+    }
+    window.onload=async()=>{if(window.ethereum){const[a]=await ethereum.request({method:'eth_accounts'});if(a){document.getElementById('walletAddr').textContent=a.slice(0,6)+'...'+a.slice(-4);document.getElementById('walletDisplay').style.display='block';document.getElementById('btn-connect').disabled=true;document.getElementById('btn-mint').disabled=false;st('Wallet connected - click Mint!','success');}}};
+  </script>
+</body>
+</html>
