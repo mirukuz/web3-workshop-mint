@@ -71,7 +71,7 @@
     <div class="info-row"><span>Mint 价格</span><span>免费 (只需 gas)</span></div>
     <div class="info-row"><span>最大供应量</span><span>8 个</span></div>
     <hr class="divider" />
-    <div id="status" class="status-box">连接钉包开始 Mint ↓</div>
+    <div id="status" class="status-box">连接钱包开始 Mint ↓</div>
     <div id="wallet-display" style="display:none">
       <div id="wallet-addr" class="wallet-badge"></div>
     </div>
@@ -87,6 +87,16 @@
 
     function encodeMint(address) {
       return '0x6a627842' + address.replace('0x','').toLowerCase().padStart(64,'0');
+    }
+
+    // balanceOf(address) selector = 0x70a08231
+    async function getBalance(address) {
+      const data = '0x70a08231' + address.replace('0x','').toLowerCase().padStart(64,'0');
+      const result = await ethereum.request({
+        method: 'eth_call',
+        params: [{ to: CONTRACT_ADDRESS, data }, 'latest']
+      });
+      return parseInt(result, 16);
     }
 
     function setStatus(msg, type) {
@@ -126,8 +136,17 @@
         document.getElementById('wallet-display').style.display = 'block';
         document.getElementById('btn-connect').textContent = '✅ 已连接';
         document.getElementById('btn-connect').disabled = true;
-        document.getElementById('btn-mint').disabled = false;
-        setStatus('✅ 钉包已连接，点击 Mint！','success');
+
+        // Check if already minted
+        const balance = await getBalance(addr);
+        if (balance > 0) {
+          setStatus('🎉 你已经拥有这个 NFT 了！', 'success');
+          document.getElementById('btn-mint').textContent = '✅ 已 Mint';
+          document.getElementById('btn-mint').disabled = true;
+        } else {
+          document.getElementById('btn-mint').disabled = false;
+          setStatus('✅ 钱包已连接，点击 Mint！','success');
+        }
       } catch(e) {
         setStatus('❌ ' + (e.message||'连接失败'),'error');
       }
@@ -136,7 +155,17 @@
     async function mintNFT() {
       try {
         const accounts = await ethereum.request({method:'eth_accounts'});
-        if (!accounts.length) { setStatus('❌ 请先连接钉包','error'); return; }
+        if (!accounts.length) { setStatus('❌ 请先连接钱包','error'); return; }
+
+        // Double-check balance before minting
+        const balance = await getBalance(accounts[0]);
+        if (balance > 0) {
+          setStatus('🎉 你已经拥有这个 NFT 了！','success');
+          document.getElementById('btn-mint').textContent = '✅ 已 Mint';
+          document.getElementById('btn-mint').disabled = true;
+          return;
+        }
+
         setStatus('⏳ 等待 MetaMask 确认...');
         document.getElementById('btn-mint').disabled = true;
         const txHash = await ethereum.request({method:'eth_sendTransaction',params:[{from:accounts[0],to:CONTRACT_ADDRESS,data:encodeMint(accounts[0]),gas:'0x30D40'}]});
@@ -174,8 +203,15 @@
           document.getElementById('wallet-display').style.display = 'block';
           document.getElementById('btn-connect').textContent = '✅ 已连接';
           document.getElementById('btn-connect').disabled = true;
-          document.getElementById('btn-mint').disabled = false;
-          setStatus('✅ 钉包已连接，点击 Mint！','success');
+          const balance = await getBalance(accounts[0]);
+          if (balance > 0) {
+            setStatus('🎉 你已经拥有这个 NFT 了！','success');
+            document.getElementById('btn-mint').textContent = '✅ 已 Mint';
+            document.getElementById('btn-mint').disabled = true;
+          } else {
+            document.getElementById('btn-mint').disabled = false;
+            setStatus('✅ 钱包已连接，点击 Mint！','success');
+          }
         }
       }
     });
